@@ -34,7 +34,7 @@ def plot_response_api(request):
 
             # Return the response as JSON
             response = {
-                'img': plot_base64
+                'img': 'image generated'
             }
             return JsonResponse(response)
 
