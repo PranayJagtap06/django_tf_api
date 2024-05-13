@@ -1,5 +1,3 @@
-from django.shortcuts import render
-from sympy import plot
 from tf_response import plot_response
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
