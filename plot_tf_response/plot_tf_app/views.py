@@ -27,13 +27,14 @@ def plot_response_api(request):
                 return JsonResponse({'error': 'Invalid mode'}, status=400)
 
             # Call the plot_response function
-            plot = plot_response(d, vin, inductor, capacitor, resistor, mode)
+            plot, sys = plot_response(d, vin, inductor, capacitor, resistor, mode)
 
             plot_base64 = base64.b64encode(plot).decode('utf-8')
 
             # Return the response as JSON
             response = {
-                'img': plot_base64
+                'img': plot_base64,
+                'transfer_func': sys,
             }
             return JsonResponse(response)
 

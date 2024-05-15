@@ -4,18 +4,29 @@ import control as ct
 import io
 
 
-def plot_response(d: float, vin: float, inductor: float, capacitor: float, resistor: float, mode: str):
-    if mode == 'Buck':
-        t, y, sys = buck_response(d, vin, inductor, capacitor, resistor)
+def plot_response(d: float, vin: float, inductor: float, capacitor: float, resistor: float, mode: str) -> tuple:
+    global y_ss, sys, t, y
+    response_functions = {
+        'Buck': buck_response,
+        'Boost': boost_response,
+        'BuckBoost': buckboost_response
+    }
+
+    # if mode == 'Buck':
+    #     t, y, sys = buck_response(d, vin, inductor, capacitor, resistor)
+    #     y_ss = y[-1]
+    # elif mode == 'Boost':
+    #     t, y, sys = boost_response(d, vin, inductor, capacitor, resistor)
+    #     y_ss = y[-1]
+    # elif mode == 'BuckBoost':
+    #     t, y, sys = buckboost_response(d, vin, inductor, capacitor, resistor)
+    #     y_ss = y[-1]
+    # else:
+    #     return tuple()
+
+    if mode in response_functions:
+        t, y, sys = response_functions[mode](d, vin, inductor, capacitor, resistor)
         y_ss = y[-1]
-    elif mode == 'Boost':
-        t, y, sys = boost_response(d, vin, inductor, capacitor, resistor)
-        y_ss = y[-1]
-    elif mode == 'BuckBoost':
-        t, y, sys = buckboost_response(d, vin, inductor, capacitor, resistor)
-        y_ss = y[-1]
-    else:
-        return None
 
     fig, ax = plt.subplots(dpi=200)
     ax.plot(t, y, label='Transient Response')  # Plot steady-state response
@@ -31,10 +42,10 @@ def plot_response(d: float, vin: float, inductor: float, capacitor: float, resis
     buf = io.BytesIO()
     plt.savefig(buf, format='png', dpi=300)
     plt.close(fig)
-    return buf.getvalue()
+    return buf.getvalue(), str(sys)
 
 
-def buck_response(d: float, vin: float, inductor: float, capacitor: float, resistor: float):
+def buck_response(d: float, vin: float, inductor: float, capacitor: float, resistor: float) -> list:
     """
     Buck Converter transfer function response.
     :param d: duty cycle.
@@ -47,13 +58,13 @@ def buck_response(d: float, vin: float, inductor: float, capacitor: float, resis
 
     num_vg = np.array([(d*vin)/(inductor*capacitor)])
     den_vg = np.array([1, 1/(resistor*capacitor), 1/(inductor*capacitor)])
-    sys = ct.tf(num_vg, den_vg)
+    sys_ = ct.tf(num_vg, den_vg)
     # print('H(s) = ', sys)
-    t, y = ct.step_response(sys)
-    return [t, y, sys]
+    t_, y_ = ct.step_response(sys_)
+    return [t_, y_, sys_]
 
 
-def boost_response(d: float, vin: float, inductor: float, capacitor: float, resistor: float):
+def boost_response(d: float, vin: float, inductor: float, capacitor: float, resistor: float) -> list:
     """
     Boost Converter transfer function response.
     :param d: duty cycle.
@@ -66,13 +77,13 @@ def boost_response(d: float, vin: float, inductor: float, capacitor: float, resi
 
     num_vg = np.array([((1-d)*vin)/(inductor*capacitor)])
     den_vg = np.array([1, 1/(resistor*capacitor), ((1-d)**2)/(inductor*capacitor)])
-    sys = ct.tf(num_vg, den_vg)
+    sys_ = ct.tf(num_vg, den_vg)
     # print('H(s) = ', sys)
-    t, y = ct.step_response(sys)
-    return [t, y, sys]
+    t_, y_ = ct.step_response(sys_)
+    return [t_, y_, sys_]
 
 
-def buckboost_response(d: float, vin: float, inductor: float, capacitor: float, resistor: float):
+def buckboost_response(d: float, vin: float, inductor: float, capacitor: float, resistor: float) -> list:
     """
     Buck Boost Converter transfer function response.
     :param d: duty cycle.
@@ -85,8 +96,7 @@ def buckboost_response(d: float, vin: float, inductor: float, capacitor: float, 
 
     num_vg = np.array([-(((1-d)*d)*vin)/(inductor*capacitor)])
     den_vg = np.array([1, 1/(resistor*capacitor), ((1-d)**2)/(inductor*capacitor)])
-    sys = ct.tf(num_vg, den_vg)
+    sys_ = ct.tf(num_vg, den_vg)
     # print('H(s) = ', sys)
-    t, y = ct.step_response(sys)
-    return [t, y, sys]
-
+    t_, y_ = ct.step_response(sys_)
+    return [t_, y_, sys_]
