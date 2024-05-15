@@ -17,8 +17,10 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from django.urls import include, path
+from plot_tf_app.views import plot_response_api
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path('api/', include('plot_tf_app.urls')),
+    path('', plot_response_api, name='plot_response_api'),
 ]

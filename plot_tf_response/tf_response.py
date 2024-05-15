@@ -1,4 +1,4 @@
-﻿from matplotlib import pyplot as plt
+from matplotlib import pyplot as plt
 import numpy as np
 import control as ct
 import io
@@ -18,7 +18,7 @@ def plot_response(d: float, vin: float, inductor: float, capacitor: float, resis
         return None
 
     fig, ax = plt.subplots(dpi=200)
-    ax.plot(t, y, label='Response')  # Plot steady-state response
+    ax.plot(t, y, label='Transient Response')  # Plot steady-state response
     ax.plot(t, [y_ss] * len(t), label='Steady State Value')
     ax.set_xlabel('Time(sec)')
     ax.set_ylabel('Response')

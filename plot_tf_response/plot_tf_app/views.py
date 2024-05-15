@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
 import base64
+import numpy as np
 
 
 @csrf_exempt
@@ -11,11 +12,11 @@ def plot_response_api(request):
         try:
             # Get the request data
             data = json.loads(request.body)
-            d = data.get('d')
-            vin = data.get('vin')
-            inductor = data.get('inductor')
-            capacitor = data.get('capacitor')
-            resistor = data.get('resistor')
+            d = np.round(float(data.get('d')), decimals=3)
+            vin = float(data.get('vin'))
+            inductor = float(data.get('inductor'))
+            capacitor = float(data.get('capacitor'))
+            resistor = float(data.get('resistor'))
             mode = data.get('mode')
 
             # Validate the input data
@@ -32,7 +33,7 @@ def plot_response_api(request):
 
             # Return the response as JSON
             response = {
-                'img': 'image generated'
+                'img': plot_base64
             }
             return JsonResponse(response)
 
